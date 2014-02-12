@@ -1,0 +1,31 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{dsfont}
+\usepackage[margin=0.0in]{geometry}
+\title{Formalization of measures}
+\author{}
+\date{}
+
+\newcommand{\tuple}[1]{\left \langle #1\right\rangle}
+\newcommand{\set}[1]{\left\{#1\right\}}
+
+\begin{document}
+\maketitle
+
+\LARGE
+
+\section{Preliminaries}
+
+Let $T$ be the corpus of length $N$ consisting of the phoneme sequence $\tuple{T_1,\ldots, T_n}$. Let $T_{i,j}$ be the substring of $T$ starting at position $i$ and ending at position $j$ (inclusive). Let $L=\set{L_1, \ldots, L_m}$ be the gold lexicon, that is, a set of $m$ sequences of phones covering the entire corpus.
+
+\subsection{Definitions}
+
+\begin{eqnarray*}
+F_{\textrm{all}} &= &\set{\tuple{i,j} \in\mathds{N}\times\mathds{N} | 1\leq i\leq j\leq N , 3\leq j-i+1\leq 20}\\
+P_{\textrm{gold}} &= &\set{\tuple{\tuple{i,j},\tuple{k,l}}\in F_{\textrm{all}}\times F_{\textrm{all}} | T_{i,j}=T_{k,l}, \set{i,\ldots,j}\cap\set{k,\ldots,l}=\emptyset}\\
+P_{\textrm{disc} &= &\set{\tuple{\tuple{i,j}, \tuple{k,l}} \in \mathds{N}^4 | T_{i,j} \textrm{ and } T_{k,l} \textrm{ is a discovered fragment pair}}\\
+P_{\textrm{subs}} &= &\textrm{Closure of $P_{\textrm{disc}}$ under \smallcaps{SUBSTRING}}\\
+\end{eqnarray*}
+
+
+\end{document}

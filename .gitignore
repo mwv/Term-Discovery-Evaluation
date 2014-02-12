@@ -1,0 +1,57 @@
+*.py[cod]
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Complexity
+output/*.html
+output/*/index.html
+
+# Sphinx
+docs/_build
+/docs/auto/metrics.el
+/docs/metrics.log
+/docs/metrics.prv/tmp12715FBE/pr1-1.png
+/docs/metrics.prv/tmp12715FBE/pr1-10.png
+/docs/metrics.prv/tmp12715FBE/pr1-11.png
+/docs/metrics.prv/tmp12715FBE/pr1-12.png
+/docs/metrics.prv/tmp12715FBE/pr1-2.png
+/docs/metrics.prv/tmp12715FBE/pr1-3.png
+/docs/metrics.prv/tmp12715FBE/pr1-4.png
+/docs/metrics.prv/tmp12715FBE/pr1-5.png
+/docs/metrics.prv/tmp12715FBE/pr1-6.png
+/docs/metrics.prv/tmp12715FBE/pr1-7.png
+/docs/metrics.prv/tmp12715FBE/pr1-8.png
+/docs/metrics.prv/tmp12715FBE/pr1-9.png
+/docs/prv_metrics.log

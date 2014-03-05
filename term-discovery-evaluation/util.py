@@ -17,6 +17,27 @@
 
 from __future__ import division
 import numpy as np
+import os
+import os.path as path
+import fnmatch
+
+
+def rglob(rootdir, pattern):
+    for root, _, files in os.walk(rootdir):
+        for basename in files:
+            if fnmatch.fnmatch(basename, pattern):
+                yield path.join(root, basename)
+
+
+def split(iter, cond):
+    r = []
+    for e in iter:
+        if cond(e):
+            yield r
+            r = []
+        else:
+            r.append(e)
+    yield r
 
 
 def edit_distance(s1, s2, inscost=1, delcost=1, subcost=1, normalize=True):
@@ -104,7 +125,7 @@ def allcommonsubstrings(s1, s2, minlength=2):
         while True:
             s = starters[i]
             alignment = s1[s[0] - m[s]: s[0]]
-            align_ids = [(s[0] + n, s[1] - m[s] + n)
+            align_ids = [(s[0] - m[s] + n, s[1] - m[s] + n)
                          for n in xrange(m[s])]
             alignments.append((alignment, zip(*align_ids)))
             starters = filter(lambda x: x not in align_ids,

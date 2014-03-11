@@ -19,7 +19,7 @@ from __future__ import division
 import numpy as np
 
 
-def allcommonsubstrings(s1, s2, minlength=3, debug=False):
+def allcommonsubstrings(XA, XB, minlength=3):
     """Find all common substrings between s1 and s2.
 
     Arguments:
@@ -29,25 +29,24 @@ def allcommonsubstrings(s1, s2, minlength=3, debug=False):
 
     Returns list of (substring, (indices in s1, indices in s2))
     """
-    m = np.zeros((len(s1)+1, len(s2)+1), dtype=np.int)
-    for i in xrange(1, len(s1)+1):
-        for j in xrange(1, len(s2)+1):
-            if s1[i-1] == s2[j-1]:
+    mA = XA.shape[0]
+    mB = XB.shape[0]
+    m = np.zeros((mA+1, mB+1), dtype=np.int)
+    for i in xrange(1, mA+1):
+        for j in xrange(1, mB+1):
+            if XA[i-1] == XB[j-1]:
                 m[i, j] = m[i-1, j-1] + 1
     starters = sorted(zip(*np.nonzero(m >= minlength)),
                       key=lambda x: m[x],
                       reverse=True)
-    if debug:
-        _starters = starters[:]
     if len(starters) == 0:
         return []
     alignments = []
-    i = 0
     while True:
-        s = starters[i]
-        alignment = s1[s[0] - m[s]: s[0]]
+        s = starters[0]
+        alignment = XA[s[0] - m[s]: s[0]]
         align_ids = [(s[0] - m[s] + n, s[1] - m[s] + n)
-                     for n in xrange(m[s])]
+                     for n in xrange(1, m[s]+1)]
         _align_ids = zip(*align_ids)
         for start in xrange(len(alignment)):
             for end in xrange(start + minlength, len(alignment)+1):
@@ -55,11 +54,6 @@ def allcommonsubstrings(s1, s2, minlength=3, debug=False):
                                    (_align_ids[0][start:end],
                                     _align_ids[1][start:end])))
         starters = [x for x in starters if x not in align_ids]
-        # starters = filter(lambda x: x not in align_ids,
-        #                   starters)
-        i += 1
-        if i == len(starters):
+        if len(starters) == 0:
             break
-    if debug:
-        return alignments, m, _starters
     return alignments

@@ -33,12 +33,59 @@ phncorrecteddir = path.join(os.environ['HOME'], 'data', 'output',
 __phonesp = compile(r"^ *(?P<end>\d+(?:\.\d*)?|\.\d+) +\d+ +(?P<symbol>.+)$")
 __wordsp = compile(r"^ *(?P<end>\d+(?:\.\d*)?|\.\d+)"
                    " +\d+ +(?P<symbol>.+?);.*$")
+__triphonep = compile(r"^(?P<pre>.+?)-(?P<symbol>.+?)\+(?P<post>.+?)$")
 Interval = namedtuple('Interval', ['start', 'end'])
-Interval.__repr__ = lambda x: '[{0}, {1}]'.format(x.start, x.end)
+Interval.__repr__ = lambda x: '[{0:.3f}, {1:.3f}]'.format(x.start, x.end)
 FileSet = namedtuple('FileSet', ['phones', 'words', 'txt', 'wav'])
 
 with open('buckeye_foldings.json') as fid:
     __fold = json.load(fid)
+
+
+def readmlf(fname):
+    """Read triphone mlf"""
+    result = []
+    current_intervals = None
+    current_symbols = None
+    current_fname = None
+    current_contexts = None
+    in_file = False
+    for line in open(fname):
+        if line.startswith('"'):
+            current_fname = line.strip().split('/')[1].split('.')[0]
+            in_file = False
+            continue
+        elif line.startswith('<s>'):
+            in_file = True
+            current_intervals = []
+            current_symbols = []
+            current_contexts = []
+            continue
+        elif (line.startswith('</s>')
+              or line.startswith('#!MLF!#')):
+            in_file = False
+            continue
+        elif line.startswith('.'):
+            result.append((current_fname, current_symbols,
+                           current_intervals, current_contexts))
+            current_fname = None
+            current_symbols = None
+            current_intervals = None
+            current_contexts = None
+            in_file = False
+            continue
+        elif not in_file:
+            raise ValueError('error parsing line: {0}'.format(line))
+        # now we are in_file and parsing interval lines
+        line = line.strip().split()
+        current_intervals.append(Interval(int(line[0]), int(line[1])))
+        m = match(__triphonep, line[2])
+        symbol = m.group('symbol')
+        current_symbols.append(symbol)
+        pre = m.group('pre')
+        post = m.group('post')
+        current_contexts.append((pre, post))
+    return result
 
 
 def extract_content(filename, filetype, foldphones=False):

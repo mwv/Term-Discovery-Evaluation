@@ -21,11 +21,21 @@ Let $T$ be the corpus of length $N$ consisting of the phoneme sequence $\tuple{T
 \subsection{Definitions}
 
 \begin{eqnarray*}
-F_{\textrm{all}} &= &\set{\tuple{i,j} \in\mathds{N}\times\mathds{N} | 1\leq i\leq j\leq N , 3\leq j-i+1\leq 20}\\
-P_{\textrm{gold}} &= &\set{\tuple{\tuple{i,j},\tuple{k,l}}\in F_{\textrm{all}}\times F_{\textrm{all}} | T_{i,j}=T_{k,l}, \set{i,\ldots,j}\cap\set{k,\ldots,l}=\emptyset}\\
-P_{\textrm{disc} &= &\set{\tuple{\tuple{i,j}, \tuple{k,l}} \in \mathds{N}^4 | T_{i,j} \textrm{ and } T_{k,l} \textrm{ is a discovered fragment pair}}\\
+F_{\textrm{all}} &= &\set{\tuple{i,j} \in\mathds{N}\times\mathds{N} | 1\leq i\leq j\leq N \wedge 3\leq j-i+1\leq 20}\\
+P_{\textrm{gold}} &= &\set{\tuple{\tuple{i,j},\tuple{k,l}}\in F_{\textrm{all}}\times F_{\textrm{all}} | T_{i,j}=T_{k,l} \wedge \set{i,\ldots,j}\cap\set{k,\ldots,l}=\emptyset}\\
+P_{\textrm{disc}} &= &\set{\tuple{\tuple{i,j}, \tuple{k,l}} \in F_{\textrm{all}}\times F_{\textrm{all}} | (T_{i,j}, T_{k,l}) \textrm{ is a discovered fragment pair}}\\
 P_{\textrm{subs}} &= &\textrm{Closure of $P_{\textrm{disc}}$ under \smallcaps{SUBSTRING}}\\
+C_{\textrm{disc}} &= &\textrm{Set of discovered clusters, each cluster being a set of fragments}\\
+P_{\textrm{clus}} &= &\set{\tuple{\tuple{i,j},\tuple{k,l}} | \exists c \in C_{\textrm{disc}} (\tuple{i,j}\in c \wedge \tuple{k,l}\in c)}\\
+P_{\textrm{goldclus}} &= &\{\tuple{\tuple{i,j},\tuple{k,l}} | \\
+& &\exists c_1, c_2 \in C_{\textrm{disc}} (\tuple{i,j}\in c_1 \wedge \tuple{k,l}\in c_2) \wedge\\
+& &T_{i,j}=T_{k,l} \wedge \set{i, \ldots, j}\cap\set{k, \ldots, l}=\emptyset \}\\
+ P_{\textrm{goldlex}} &= &\{\tuple{\tuple{i,j}, \tuple{k,l}}\in F_{\textrm{all}}\times F_{\textrm{all}} | \\
+& &T_{i,j}=T_{k,l}\in L \wedge i,j,k,l\in\textrm{cover}(P_{\textrm{disc}})\wedge \set{i,\ldots,j}\cap\set{k,\ldots,l}=\emptyset\}
 \end{eqnarray*}
+
+\subsection{Functions}
+
 
 
 \end{document}

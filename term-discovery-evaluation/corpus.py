@@ -27,6 +27,8 @@ import util
 
 datadir = path.join(os.environ['HOME'],
                     'data', 'BUCKEYE')
+phncorrecteddir = path.join(os.environ['HOME'], 'data', 'output',
+                            'lrec_buckeye', 'phon_corrected', 'phn')
 
 __phonesp = compile(r"^ *(?P<end>\d+(?:\.\d*)?|\.\d+) +\d+ +(?P<symbol>.+)$")
 __wordsp = compile(r"^ *(?P<end>\d+(?:\.\d*)?|\.\d+)"
@@ -56,7 +58,13 @@ def extract_content(filename, filetype, foldphones=False):
         start_prev = 0.0
         for line in open(filename):
             if filetype == 'phones':
-                m = match(__phonesp, line)
+                line = line.strip().split()
+                if foldphones:
+                    symbol = fold(line[2])
+                else:
+                    symbol = line[2]
+                s.append((symbol, Interval(float(line[0]), float(line[1]))))
+                continue
             elif filetype == 'words':
                 m = match(__wordsp, line)
             else:
@@ -82,7 +90,10 @@ def get_filesets():
             continue
         wordsfile = path.splitext(wavfile)[0] + '.words'
         txtfile = path.splitext(wavfile)[0] + '.txt'
-        phonesfile = path.splitext(wavfile)[0] + '.phones'
+        phonesfile = path.join(phncorrecteddir,
+                               path.splitext(path.basename(wavfile))[0]
+                               + '.phn')
+        # phonesfile = path.splitext(wavfile)[0] + '.phones'
         if not (path.exists(wordsfile) and
                 path.exists(txtfile) and
                 path.exists(phonesfile)):

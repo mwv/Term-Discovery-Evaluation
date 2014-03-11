@@ -17,6 +17,7 @@
 
 
 SPLITS = """<EXCLUDE-name>
+__
 <EXCLUDE>
 <exclude-Name>
 EXCLUDE

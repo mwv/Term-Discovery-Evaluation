@@ -49,6 +49,23 @@ def edit_distance(s1, s2, inscost=1, delcost=1, subcost=1, normalize=True):
     return d
 
 
+def lev(XA, XB, inscost=7, delcost=7, subcost=10):
+    m = len(XA)
+    n = len(XB)
+    h = np.zeros((m+1, n+1), dtype=np.uint64)
+    h[:, 0] = np.arange(0, m+1)
+    h[0, :] = np.arange(0, n+1)
+    for i in range(1, m+1):
+        for j in range(1, n+1):
+            if XA[i-1] == XB[j-1]:
+                h[i, j] = h[i-1, j-1]
+            else:
+                h[i, j] = min(h[i-1, j] + delcost,
+                              h[i, j-1] + inscost,
+                              h[i-1, j-1] + subcost)
+    return h[-1, -1]
+
+
 def edit(ref_transcript, pred_transcript,
          inscost=7, delcost=7, subcost=10):
     """edit:

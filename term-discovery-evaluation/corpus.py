@@ -35,7 +35,7 @@ __wordsp = compile(r"^ *(?P<end>\d+(?:\.\d*)?|\.\d+)"
                    " +\d+ +(?P<symbol>.+?);.*$")
 __triphonep = compile(r"^(?P<pre>.+?)-(?P<symbol>.+?)\+(?P<post>.+?)$")
 Interval = namedtuple('Interval', ['start', 'end'])
-Interval.__repr__ = lambda x: '[{0:.3f}, {1:.3f}]'.format(x.start, x.end)
+Interval.__repr__ = lambda x: '[{0}, {1}]'.format(x.start, x.end)
 FileSet = namedtuple('FileSet', ['phones', 'words', 'txt', 'wav'])
 
 with open('buckeye_foldings.json') as fid:
@@ -53,17 +53,17 @@ def readmlf(fname):
     for line in open(fname):
         if line.startswith('"'):
             current_fname = line.strip().split('/')[1].split('.')[0]
-            in_file = False
-            continue
-        elif line.startswith('<s>'):
             in_file = True
             current_intervals = []
             current_symbols = []
             current_contexts = []
             continue
+        elif line.startswith('<s>'):
+            # just ignore
+            continue
         elif (line.startswith('</s>')
               or line.startswith('#!MLF!#')):
-            in_file = False
+            # just ignore
             continue
         elif line.startswith('.'):
             result.append((current_fname, current_symbols,
@@ -80,6 +80,8 @@ def readmlf(fname):
         line = line.strip().split()
         current_intervals.append(Interval(int(line[0]), int(line[1])))
         m = match(__triphonep, line[2])
+        if m is None:
+            continue
         symbol = m.group('symbol')
         current_symbols.append(symbol)
         pre = m.group('pre')

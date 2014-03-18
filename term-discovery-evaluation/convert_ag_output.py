@@ -17,43 +17,10 @@
 
 from __future__ import division
 
-import re
-from itertools import izip_longest
 from collections import defaultdict
 
 import corpus
-
-
-def grouper(iterable, n, fillvalue=None):
-    "Collect data into fixed-length chunks or blocks"
-    args = [iter(iterable)] * n
-    return izip_longest(fillvalue=fillvalue, *args)
-
-
-def parseinputfile(fname):
-    """Parse 'gold' input files that were sent to Mark.
-
-    The input is a file with on each line:
-    <file_id> phon_0 [interval0] phon_1 [interval1] (word0 [wordinterval0]) ...
-
-    The functions yields (file_id, phones, intervals) triples,
-    one for each line in the input
-
-    :param fname: string filename
-    """
-    parens_pattern = re.compile(r" \((.*?)\)")
-    for line in open(fname, 'r'):
-        chunks = re.sub(parens_pattern, "", line).strip().split(' ')
-        file_id = chunks[0]
-        p = [(x[0],
-              corpus.Interval(float(x[1][1:-1]),
-                              float(x[2][:-1])))
-             for x in grouper(chunks[1:], 3)]
-        try:
-            phones, intervals = zip(*p)
-        except ValueError:
-            phones, intervals = (None, None)
-        yield (file_id, phones, intervals)
+from util import parseinputfile
 
 
 def align_chunks(chunks, phones):

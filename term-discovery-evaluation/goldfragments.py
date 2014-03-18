@@ -58,7 +58,11 @@ def run(chunkstart):
         fname2, phones2, intervals2 = plist2
         phones1_ = np.array([phon2idx[p] for p in phones1])
         phones2_ = np.array([phon2idx[p] for p in phones2])
-        alignments = allcommonsubstrings(phones1_, phones2_, 3)
+        if fname1 == fname2:
+            same = 1
+        else:
+            same = 0
+        alignments = allcommonsubstrings(phones1_, phones2_, 3, same=same)
         if alignments is None:
             continue
         for row in alignments:

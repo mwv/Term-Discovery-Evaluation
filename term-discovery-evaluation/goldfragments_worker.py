@@ -25,12 +25,11 @@ from collections import defaultdict
 
 import numpy as np
 
-from util import parseinputfile, split
 from cacss import allcommonsubstrings
 import corpus
 
 
-CHUNKSIZE = 100000
+CHUNKSIZE = 10000000
 
 outdir = path.join(os.environ['HOME'], 'data', 'output',
                    'lrec_buckeye', 'goldcorrected')
@@ -38,9 +37,6 @@ try:
     os.makedirs(outdir)
 except OSError:
     pass
-
-goldfile = path.join(os.environ['HOME'], 'data', 'output',
-                     'lrec_buckeye', 'phon', 'phongold.txt')
 
 with open('phondict.pkl', 'rb') as fid:
     phon2idx = pickle.load(fid)
@@ -76,12 +72,12 @@ def run(chunkstart):
                                         corpus.Interval(intervals1[row[0]]
                                                         .start,
                                                         intervals1[row[0] +
-                                                                   row[2]]
+                                                                   row[2]-1]
                                                         .end),
                                         corpus.Interval(intervals2[row[1]]
                                                         .start,
                                                         intervals2[row[1] +
-                                                                   row[2]]
+                                                                   row[2]-1]
                                                         .end)))
     return r
 
@@ -106,6 +102,3 @@ if __name__ == '__main__':
     r = run((task_id-1) * CHUNKSIZE)
     outfile = path.join(outdir, 'gold_chunk_{0}.txt'.format(task_id))
     write(r, outfile)
-    # gold = list(phongold())
-    # with open('gold.pkl', 'wb') as fid:
-    #     pickle.dump(gold, fid, -1)

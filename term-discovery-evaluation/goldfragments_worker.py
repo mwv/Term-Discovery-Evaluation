@@ -25,15 +25,15 @@ from collections import defaultdict
 
 import numpy as np
 
-from util import parseinputfile
-from corpus import Interval
+from util import parseinputfile, split
 from cacss import allcommonsubstrings
+import corpus
 
 
 CHUNKSIZE = 100000
 
 outdir = path.join(os.environ['HOME'], 'data', 'output',
-                   'lrec_buckeye', 'gold')
+                   'lrec_buckeye', 'goldcorrected')
 try:
     os.makedirs(outdir)
 except OSError:
@@ -46,13 +46,19 @@ with open('phondict.pkl', 'rb') as fid:
     phon2idx = pickle.load(fid)
 idx2phon = {v: k for k, v in phon2idx.iteritems()}
 
+phondir = corpus.phncorrecteddir
+
+goldfile = path.join(os.environ['HOME'], 'data', 'output',
+                     'lrec_buckeye', 'phon', 'phongoldcorrected.pkl')
+
+with open(goldfile, 'rb') as fid:
+    gold = pickle.load(fid)
+
 
 def run(chunkstart):
     r = defaultdict(list)
-    for plist1, plist2 in islice(chain(combinations(parseinputfile(goldfile),
-                                                    2),
-                                       izip(*tee(parseinputfile(goldfile),
-                                                 2))),
+    for plist1, plist2 in islice(chain(combinations(gold, 2),
+                                       izip(*tee(gold, 2))),
                                  chunkstart, chunkstart+CHUNKSIZE):
         fname1, phones1, intervals1 = plist1
         fname2, phones2, intervals2 = plist2
@@ -67,12 +73,16 @@ def run(chunkstart):
             continue
         for row in alignments:
             r[(fname1, fname2)].append((phones1[row[0]: row[0] + row[2]],
-                                        Interval(intervals1[row[0]].start,
-                                                 intervals1[row[0] +
-                                                            row[2]].end),
-                                        Interval(intervals2[row[1]].start,
-                                                 intervals2[row[1] +
-                                                            row[2]].end)))
+                                        corpus.Interval(intervals1[row[0]]
+                                                        .start,
+                                                        intervals1[row[0] +
+                                                                   row[2]]
+                                                        .end),
+                                        corpus.Interval(intervals2[row[1]]
+                                                        .start,
+                                                        intervals2[row[1] +
+                                                                   row[2]]
+                                                        .end)))
     return r
 
 
@@ -95,3 +105,7 @@ if __name__ == '__main__':
     task_id = int(os.getenv('SGE_TASK_ID'))
     r = run((task_id-1) * CHUNKSIZE)
     outfile = path.join(outdir, 'gold_chunk_{0}.txt'.format(task_id))
+    write(r, outfile)
+    # gold = list(phongold())
+    # with open('gold.pkl', 'wb') as fid:
+    #     pickle.dump(gold, fid, -1)

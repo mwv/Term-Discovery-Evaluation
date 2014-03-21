@@ -26,6 +26,26 @@ from itertools import izip_longest, islice
 import corpus
 
 
+def approx_eq(x, y, epsilon=0.001):
+    return abs(x-y) < epsilon
+
+
+def approx_lt(x, y, epsilon=0.001):
+    return x < y and abs(x-y) > epsilon
+
+
+def approx_gt(x, y, epsilon=0.001):
+    return x > y and abs(x-y) > epsilon
+
+
+def approx_leq(x, y, epsilon=0.001):
+    return approx_lt(x, y, epsilon) or approx_eq(x, y, epsilon)
+
+
+def approx_geq(x, y, epsilon=0.001):
+    return approx_gt(x, y, epsilon) or approx_eq(x, y, epsilon)
+
+
 def nth(iterable, n, default=None):
     "Returns the nth item or a default value"
     return next(islice(iterable, n, None), default)
@@ -42,11 +62,13 @@ def split(iter, cond):
     r = []
     for e in iter:
         if cond(e):
-            yield r
-            r = []
+            if r:
+                yield r
+                r = []
         else:
             r.append(e)
-    yield r
+    if r:
+        yield r
 
 
 def grouper(iterable, n, fillvalue=None):

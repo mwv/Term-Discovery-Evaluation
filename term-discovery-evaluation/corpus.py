@@ -37,9 +37,47 @@ __triphonep = compile(r"^(?P<pre>.+?)-(?P<symbol>.+?)\+(?P<post>.+?)$")
 Interval = namedtuple('Interval', ['start', 'end'])
 Interval.__repr__ = lambda x: '[{0}, {1}]'.format(x.start, x.end)
 FileSet = namedtuple('FileSet', ['phones', 'words', 'txt', 'wav'])
+Fragment = namedtuple('Fragment', ['fname', 'phones', 'interval'])
 
 with open('buckeye_foldings.json') as fid:
     __fold = json.load(fid)
+
+
+def parse_goldfile(f):
+    curr_fname1 = None
+    curr_fname2 = None
+    curr_fragments = []
+    for line in open(f):
+        if line.startswith('s'):
+            if curr_fname1 is None:
+                curr_fname1 = line.strip()
+            elif curr_fname2 is None:
+                curr_fname2 = line.strip()
+            else:
+                raise ValueError('attempting to read filename while filenames'
+                                 ' have already been read.')
+        elif line.strip() == '':
+            for fragment in curr_fragments:
+                yield fragment
+            curr_fname1 = None
+            curr_fname2 = None
+            curr_fragments = []
+        else:
+            if curr_fname1 is None or curr_fname2 is None:
+                raise ValueError('attempting to read intervals while'
+                                 ' filenames are None')
+            s = line.strip().split(' ')
+            phonseq = tuple(s[0].split('-'))
+            interval1 = Interval(float(s[1]), float(s[2]))
+            interval2 = Interval(float(s[3]), float(s[4]))
+            curr_fragments.append(Fragment(curr_fname1,
+                                           phonseq,
+                                           interval1))
+            curr_fragments.append(Fragment(curr_fname2,
+                                           phonseq,
+                                           interval2))
+    for fragment in curr_fragments:
+        yield fragment
 
 
 def readmlf(fname):
@@ -158,3 +196,17 @@ def fold(phone):
         return __fold[phone]
     except KeyError:
         return phone
+
+
+def phongold():
+    for phnfile, _, _, _ in get_filesets():
+        bname = path.splitext(path.basename(phnfile))[0]
+        for idx, pair in enumerate(util.split(extract_content(phnfile,
+                                                              'phones'),
+                                              lambda x: x[0] == '__')):
+            try:
+                phones, intervals = zip(*pair)
+            except ValueError as e:
+                print bname, pair
+                raise e
+            yield bname + '_{0}'.format(idx), phones, intervals
